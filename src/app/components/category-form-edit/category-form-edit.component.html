@@ -1,0 +1,12 @@
+<h1>Edit Category</h1>
+
+<form>
+    <div>
+        <mat-form-field appearance="fill">
+            <mat-label>Name</mat-label>
+            <input matInput type="text" placeholder="Name" [formControl]="name" required>
+            <mat-error *ngIf="name!.invalid">Invalid name!</mat-error>
+        </mat-form-field>
+    </div>
+</form>
+<button type="submit" mat-raised-button color="primary" (click)="onSubmitButtonClicked()">Submit</button>
