@@ -11,7 +11,7 @@
 
 
 <mat-list role="list">
-    <mat-list-item role="listitem" *ngFor="let item of data$ | async">
+    <mat-list-item role="listitem" *ngFor="let item of filteredData$ | async">
         <button [routerLink]="'categories/' + item.id" mat-button> {{item.name}}</button>
         <button [routerLink]="'categories/edit/' + item.id" color="transparent" mat-button>
             <mat-icon>edit</mat-icon>
