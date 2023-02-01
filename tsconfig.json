@@ -22,7 +22,8 @@
 			"dom"
 		],
 		"paths": {
-		}
+		},
+		"allowSyntheticDefaultImports": true
 	},
 	"angularCompilerOptions": {
 		"enableI18nLegacyMessageIdFormat": false,

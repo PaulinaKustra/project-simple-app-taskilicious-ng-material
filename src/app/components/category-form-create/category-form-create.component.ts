@@ -17,10 +17,10 @@ export class CategoryFormCreateComponent {
     }
 
     onCreateButtonClicked() {
-     if(this.name.valid) {
-         this._categoryService.create({
-             name: this.name.value ?? ''
-         }).subscribe(() => this._router.navigate(['']));
-     }
+        if (this.name.valid) {
+            this._categoryService.create({
+                name: this.name.value ?? ''
+            }).subscribe(() => this._router.navigate(['']));
+        }
     }
 }
