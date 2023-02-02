@@ -23,19 +23,20 @@ export class CategoryFormEditComponent {
         );
 
     constructor(private _categoryService: CategoryService, private _activatedRoute: ActivatedRoute, private _router: Router) {
-        this.data$.subscribe()
+       this.subscription = this.data$.subscribe()
     }
 
     onSubmitButtonClicked() {
-        if(this.name.valid) {
-        this._activatedRoute.params.pipe(
-            take(1),
-            switchMap((data) => this._categoryService.edit({
-                id: data['id'],
-                name: this.name.value ?? '',
+        if (this.name.valid) {
+            this._activatedRoute.params.pipe(
+                take(1),
+                switchMap((data) => this._categoryService.edit({
+                    id: data['id'],
+                    name: this.name.value ?? '',
 
-            }))).subscribe(() => this._router.navigate(['']));
-    }}
+                }))).subscribe(() => this._router.navigate(['']));
+        }
+    }
 
     onDestroy() {
         this.subscription?.unsubscribe();
