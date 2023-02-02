@@ -1,5 +1,5 @@
 <h1>Welcome to Category: {{(data$ | async)?.name}}</h1>
-<ng-container *ngIf="tasks$ | async as list">
+<ng-container *ngIf="tasksWithUrls$ | async as list">
     <table mat-table [dataSource]="list" class="mat-elevation-z8">
         <!-- Column 1 -->
         <ng-container matColumnDef="Name">
@@ -12,6 +12,15 @@
             <td mat-cell *matCellDef="let element"> {{element.categoryId}} </td>
         </ng-container>
         <!-- Column 3 -->
+        <ng-container matColumnDef="Team Members">
+            <th mat-header-cell *matHeaderCellDef> Team Members</th>
+            <td mat-cell *matCellDef="let element">
+                <ng-container *ngFor="let member of element.teamMemberIds">
+                <img height="30px" width="30px" src="{{member}}">
+                </ng-container>
+            </td>
+        </ng-container>
+        <!-- Column 4 -->
         <ng-container matColumnDef="Edit">
             <th mat-header-cell *matHeaderCellDef> Edit</th>
             <td mat-cell *matCellDef="let element">
@@ -30,8 +39,8 @@
             </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="['Name', 'Category ID', 'Edit', 'Remove']"></tr>
-        <tr mat-row *matRowDef="let row; columns: ['Name', 'Category ID', 'Edit', 'Remove'];"></tr>
+        <tr mat-header-row *matHeaderRowDef="['Name', 'Category ID', 'Team Members', 'Edit', 'Remove']"></tr>
+        <tr mat-row *matRowDef="let row; columns: ['Name', 'Category ID', 'Team Members', 'Edit', 'Remove'];"></tr>
     </table>
 </ng-container>
 <button (click)="onCreateButtonClicked()" mat-mini-fab>

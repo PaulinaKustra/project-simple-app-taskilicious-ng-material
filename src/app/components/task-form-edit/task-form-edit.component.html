@@ -17,6 +17,15 @@
             </mat-select>
         </mat-form-field>
     </div>
+    <h2>Choose Team Members</h2>
+    <div>
+        <ng-container>
+            <label formArrayName="teamMembers" *ngFor="let tag of teamMembersArray.controls; let i = index">
+                <input type="checkbox" [formControlName]="i">
+                <img height="30px" width="30px" src="{{data[i].avatar}}">{{data[i].name}}
+            </label>
+        </ng-container>
+    </div>
     <div>
         <button type="submit" mat-raised-button color="primary">Submit</button>
     </div>
