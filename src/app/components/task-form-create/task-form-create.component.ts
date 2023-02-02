@@ -8,6 +8,7 @@ import {TeamMemberModel} from '../../models/team-member.model';
 import {CategoryService} from '../../services/category.service';
 import {TaskService} from '../../services/task.service';
 import {TeamMemberService} from '../../services/team-member.service';
+import {UploadClient} from "@uploadcare/upload-client";
 
 @Component({
     selector: 'app-task-form-create',
@@ -20,25 +21,29 @@ export class TaskFormCreateComponent {
     readonly form: FormGroup = new FormGroup({
         name: new FormControl('', [Validators.required]),
         categoryId: new FormControl('', [Validators.required]),
+        imageUrl: new FormControl(),
+        imageFile: new FormControl(),
         teamMembers: new FormArray([])
     });
+
     get teamMembersArray() {
         return this.form.controls['teamMembers'] as FormArray;
     }
+    client = new UploadClient({publicKey: 'b66cb5aa61ed990132b2'})
 
-    readonly categories$: Observable<CategoryModel[]> = this._categoryService.getAll();
-    readonly teamMembers$: Observable<TeamMemberModel[]> = this._teamMemberService.getAll().pipe(switchMap((members) =>
+    readonly teamMembers$: Observable<TeamMemberModel[]> = this._teamMemberService.getAll().pipe(switchMap(() =>
             this._teamMemberService.getAll()
         ),
         take(1),
         tap((members) => {
+
+            members.forEach(() => {
+                this.teamMembersArray.push(new FormControl(false))
+            })
             this.data = members;
-            members.forEach((member) => {
-                        this.teamMembersArray.push(new FormControl(false))
-                    })
         })
     );
-
+    readonly categories$: Observable<CategoryModel[]> = this._categoryService.getAll();
     data: TeamMemberModel[] = [];
     subscription: Subscription | undefined;
 
@@ -51,7 +56,7 @@ export class TaskFormCreateComponent {
         private _teamMemberService: TeamMemberService) {
         this.subscription = this.teamMembers$.subscribe();
         this._activatedRoute.params
-            .pipe(take(1),tap((dataRoute) => {
+            .pipe(take(1), tap((dataRoute) => {
                     this.form.patchValue({categoryId: dataRoute['categoryId']})
                 }
             )).subscribe();
@@ -59,18 +64,43 @@ export class TaskFormCreateComponent {
 
 
     onFormSubmitted(form: FormGroup): void {
-        if (this.form.valid) {
-            let teamMemberIds = this.data.filter((value, index) => form.value.teamMembers[index]).map(x => x.id)
-            this._taskService.create({
-                name: form.value.name,
-                categoryId: form.value.categoryId,
-                teamMemberIds: teamMemberIds,
-            }).subscribe(() => this._router.navigate(['categories/' + this.form.value.categoryId]));
+        if (form.valid) {
+            if (form.value.imageFile) {
+                this.client.uploadFile(form.value.imageFile).then((result) => {
+                    this.form.patchValue({imageUrl: result.cdnUrl})
+                    this.createTask(form);
+                })
+            } else {
+                this.createTask(form);
+            }
         }
     }
+
+    createTask(form: FormGroup) {
+        let teamMemberIds = this.data.filter((value, index) => form.value.teamMembers[index]).map(x => x.id)
+        this._taskService.create({
+            name: form.value.name,
+            categoryId: form.value.categoryId,
+            teamMemberIds: teamMemberIds,
+            imageUrl: form.value.imageUrl
+        }).subscribe(() => this._router.navigate(['categories/' + this.form.value.categoryId]));
+    }
+
+    public onFileSelected(event: any) {
+        if (event && event.target && event.target.files[0]) {
+            const file = event.target.files[0];
+            const reader = new FileReader();
+            reader.onload = (e: any) => {
+                this.form.patchValue({imageUrl: e.target.result, imageFile: file})
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
     ngOnDestroy(): void {
         if (this.subscription) {
             this.subscription.unsubscribe();
         }
     }
+
 }
