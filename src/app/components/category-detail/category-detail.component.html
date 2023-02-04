@@ -1,6 +1,6 @@
 <h1>Welcome to Category: {{(data$ | async)?.name}}</h1>
-<ng-container *ngIf="tasksWithUrls$ | async as list">
-    <table mat-table [dataSource]="list" class="mat-elevation-z8" *ngIf="(tasksWithUrls$ | async) else loading">
+<ng-container *ngIf="tasksWithUrls$ | async as list else loading">
+    <table mat-table [dataSource]="list" class="mat-elevation-z8" >
         <!-- Column 1 -->
         <ng-container matColumnDef="Image">
             <th mat-header-cell *matHeaderCellDef>Image</th>

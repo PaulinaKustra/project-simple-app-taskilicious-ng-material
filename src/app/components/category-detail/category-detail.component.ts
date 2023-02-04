@@ -1,7 +1,7 @@
 import {ChangeDetectionStrategy, Component, ViewEncapsulation} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
 import {BehaviorSubject, combineLatest, map, Observable, tap} from 'rxjs';
-import { switchMap, take} from 'rxjs/operators';
+import {switchMap, take} from 'rxjs/operators';
 import {CategoryModel} from '../../models/category.model';
 import {TaskModel} from '../../models/task.model';
 import {CategoryService} from '../../services/category.service';
@@ -34,21 +34,19 @@ export class CategoryDetailComponent {
 
     readonly tasksWithUrls$ = combineLatest([this.tasks$, this.members$]).pipe(
         map(([tasks, members]) => {
-            for (let i = 0; i < tasks.length; i++) {
-                let task = tasks[i];
-                if(task.teamMemberIds) {
-                    for (let j = 0; j < task.teamMemberIds.length; j++) {
-                        let teamMemberId = task.teamMemberIds[j];
-                        let avatar = members.find(member => member.id == teamMemberId)?.avatar;
-                        task.teamMemberIds[j] = avatar ?? '';
-                    }
-                }
+                tasks.forEach(task =>
+                    task.teamMemberIds = task.teamMemberIds?.map(teamMemberId =>
+                        teamMemberId = members.find(member => member.id === teamMemberId)?.avatar ?? ''))
+                return tasks;
             }
-            return tasks;
-        }
-    ))
+        ))
 
-    constructor(private _categoryService: CategoryService, private _activatedRoute: ActivatedRoute, private _router: Router, private _taskService: TaskService, private _teamMemberService: TeamMemberService) {
+    constructor(
+        private _categoryService: CategoryService,
+        private _activatedRoute: ActivatedRoute,
+        private _router: Router,
+        private _taskService: TaskService,
+        private _teamMemberService: TeamMemberService) {
         this.data$.subscribe()
     }
 
@@ -64,6 +62,4 @@ export class CategoryDetailComponent {
     onRemoveButtonClicked(id: string) {
         this._taskService.remove(id).subscribe(() => this._deleteSubject.next());
     }
-
-
 }
