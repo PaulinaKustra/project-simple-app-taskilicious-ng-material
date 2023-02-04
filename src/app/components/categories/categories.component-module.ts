@@ -9,9 +9,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { CategoriesComponent } from './categories.component';
 import {RouterLink} from '@angular/router';
+import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 
 @NgModule({
-    imports: [MatListModule, CommonModule, MatButtonModule, MatIconModule, MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatOptionModule, RouterLink],
+    imports: [MatListModule, CommonModule, MatButtonModule, MatIconModule, MatFormFieldModule, MatSelectModule, ReactiveFormsModule, MatOptionModule, RouterLink, MatProgressSpinnerModule],
   declarations: [CategoriesComponent],
   providers: [],
   exports: [CategoriesComponent]

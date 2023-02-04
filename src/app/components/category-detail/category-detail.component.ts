@@ -1,11 +1,13 @@
 import {ChangeDetectionStrategy, Component, ViewEncapsulation} from '@angular/core';
 import {ActivatedRoute, Router} from '@angular/router';
-import {BehaviorSubject, map, Observable, tap} from 'rxjs';
+import {BehaviorSubject, combineLatest, map, Observable, tap} from 'rxjs';
 import {switchMap, take} from 'rxjs/operators';
 import {CategoryModel} from '../../models/category.model';
 import {TaskModel} from '../../models/task.model';
 import {CategoryService} from '../../services/category.service';
 import {TaskService} from '../../services/task.service';
+import {TeamMemberModel} from "../../models/team-member.model";
+import {TeamMemberService} from "../../services/team-member.service";
 
 @Component({
     selector: 'app-category-detail',
@@ -28,7 +30,23 @@ export class CategoryDetailComponent {
                 take(1)
             )));
 
-    constructor(private _categoryService: CategoryService, private _activatedRoute: ActivatedRoute, private _router: Router, private _taskService: TaskService) {
+    readonly members$: Observable<TeamMemberModel[]> = this._teamMemberService.getAll();
+
+    readonly tasksWithUrls$ = combineLatest([this.tasks$, this.members$]).pipe(
+        map(([tasks, members]) => {
+                tasks.forEach(task =>
+                    task.teamMemberIds = task.teamMemberIds?.map(teamMemberId =>
+                        teamMemberId = members.find(member => member.id === teamMemberId)?.avatar ?? ''))
+                return tasks;
+            }
+        ))
+
+    constructor(
+        private _categoryService: CategoryService,
+        private _activatedRoute: ActivatedRoute,
+        private _router: Router,
+        private _taskService: TaskService,
+        private _teamMemberService: TeamMemberService) {
         this.data$.subscribe()
     }
 

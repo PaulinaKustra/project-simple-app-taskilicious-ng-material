@@ -1,5 +1,5 @@
 <h1>Create New Task</h1>
-<form [formGroup]="form" (ngSubmit)="onFormSubmitted(form)">
+<form *ngIf="(categories$ | async)  && data.length > 0 else loading" [formGroup]="form" (ngSubmit)="onFormSubmitted(form)">
     <div>
         <mat-form-field appearance="fill">
             <mat-label>Name</mat-label>
@@ -10,14 +10,41 @@
     <div>
         <mat-form-field appearance="fill">
             <mat-label>Choose a category</mat-label>
-            <mat-select formControlName="categoryId" >
+            <mat-select formControlName="categoryId">
                 <mat-option *ngFor="let item of categories$ | async" [value]="item.id">
                     {{item.name}}
                 </mat-option>
             </mat-select>
         </mat-form-field>
     </div>
+
+    <h2>Choose Team Members</h2>
     <div>
-        <button type="submit" mat-raised-button color="primary">Submit</button>
+        <ng-container>
+            <label formArrayName="teamMembers" *ngFor="let tag of teamMembersArray.controls; let i = index">
+                <input type="checkbox" [formControlName]="i">
+                <img *ngIf="data[i] && data[i].avatar" height="30px" width="30px" src="{{data[i].avatar}}">{{data[i].name}}
+            </label>
+        </ng-container>
+    </div>
+    <div>
+        <input type="file" accept="image/png, image/gif, image/jpeg, image/jpg" class="file-upload"
+               (change)="onFileSelected($event)">
+        <div *ngIf="form.value.imageUrl && form.value.imageUrl != ''">
+            <br>
+            <img height="50px" width="50px" [src]="form.value.imageUrl" [alt]="'Oops! There is no image.'">
+        </div>
+    </div>
+    <br>
+    <div>
+        <button type="submit" mat-raised-button color="primary">Create</button>
     </div>
 </form>
+<ng-template #loading>
+    <mat-progress-spinner
+            [color]="'primary'"
+            [mode]="'indeterminate'"
+            [value]="50">
+    </mat-progress-spinner>
+</ng-template>
+
