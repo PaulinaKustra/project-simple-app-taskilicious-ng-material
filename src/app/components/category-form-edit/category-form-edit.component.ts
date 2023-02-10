@@ -22,7 +22,9 @@ export class CategoryFormEditComponent {
             , tap((data) => this.name.patchValue(data.name))
         );
 
-    constructor(private _categoryService: CategoryService, private _activatedRoute: ActivatedRoute, private _router: Router) {
+    constructor(private _categoryService: CategoryService,
+                private _activatedRoute: ActivatedRoute,
+                private _router: Router) {
        this.subscription = this.data$.subscribe()
     }
 

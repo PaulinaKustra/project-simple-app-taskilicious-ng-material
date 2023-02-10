@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, ViewEncapsulation} from '@angular/core';
 import {FormArray, FormControl, FormGroup, Validators} from '@angular/forms';
 import {ActivatedRoute, Router} from '@angular/router';
 import {Observable, combineLatest, Subscription} from 'rxjs';
@@ -16,7 +16,7 @@ import { UploadcareService } from '../../services/uploadcare.service';
   styleUrls: ['./task-form-edit.component.scss'],
   templateUrl: './task-form-edit.component.html',
   encapsulation: ViewEncapsulation.Emulated,
-  changeDetection: ChangeDetectionStrategy.Default
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TaskFormEditComponent {
   readonly form: FormGroup = new FormGroup({
@@ -40,7 +40,12 @@ export class TaskFormEditComponent {
   data: TeamMemberModel[] = [];
   readonly categories$: Observable<CategoryModel[]> = this._categoryService.getAll();
 
-  constructor(private _categoryService: CategoryService, private _taskService: TaskService, private _activatedRoute: ActivatedRoute, private _router: Router,
+  constructor(private _categoryService: CategoryService,
+              private _taskService: TaskService,
+              private _activatedRoute: ActivatedRoute,
+              private _router: Router,
+              private _cd: ChangeDetectorRef,
+
     private _teamMemberService: TeamMemberService, private _uploadcareService: UploadcareService) {
     this.subscription = this.data$.subscribe()
     combineLatest([this.data$, this.members$]).pipe(take(1),
@@ -88,7 +93,8 @@ export class TaskFormEditComponent {
       const file = event.target.files[0];
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.form.patchValue({ imageUrl: e.target.result, imageFile: file })
+        this.form.patchValue({ imageUrl: e.target.result, imageFile: file });
+        this._cd.markForCheck();
       };
       reader.readAsDataURL(file);
     }
